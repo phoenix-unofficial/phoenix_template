@@ -175,44 +175,35 @@ defmodule Phoenix.Template do
   option. `:layout` accepts a tuple of the form
   `{LayoutModule, "template.extension"}`.
 
-  To template that goes inside the layout will be placed in the `@inner_content`
-  assign:
-
-      <%= @inner_content %>
-
+  To template that goes inside the layout will be placed in the
+  `@inner_content` assign.
   """
   def render(module, template, format, assigns) do
-    assigns
-    |> Map.new()
-    |> Map.pop(:layout, false)
-    |> render_within_layout(module, template, format)
+    {layout, assigns} =
+      assigns
+      |> Map.new()
+      |> Map.pop(:layout, false)
+
+    render_within_layout(layout, module, template, format, assigns)
   end
 
-  defp render_within_layout({false, assigns}, module, template, format) do
+  defp render_within_layout(false, module, template, format, assigns) do
     render_with_fallback(module, template, format, assigns)
   end
 
-  defp render_within_layout({{layout_mod, layout_tpl}, assigns}, module, template, format)
+  defp render_within_layout({layout_mod, layout_tpl}, module, template, format, assigns)
        when is_atom(layout_mod) and is_binary(layout_tpl) do
     content = render_with_fallback(module, template, format, assigns)
     assigns = Map.put(assigns, :inner_content, content)
     render_with_fallback(layout_mod, layout_tpl, format, assigns)
   end
 
-  defp render_within_layout({layout, _assigns}, _module, _template, _format) do
+  defp render_within_layout(layout, _module, _template, _format, _assigns) do
     raise ArgumentError, """
     invalid value for reserved key :layout in Phoenix.Template.render/4 assigns.
     :layout accepts a tuple of the form {LayoutModule, "template.extension"},
     got: #{inspect(layout)}
     """
-  end
-
-  defp encode(content, format) do
-    if encoder = format_encoder(format) do
-      encoder.encode_to_iodata!(content)
-    else
-      content
-    end
   end
 
   defp render_with_fallback(module, template, format, assigns)
@@ -247,6 +238,14 @@ defmodule Phoenix.Template do
 
       raise ArgumentError,
             "no \"#{template}\" #{format} template defined for #{inspect(module)} #{reason}"
+    end
+  end
+
+  defp encode(content, format) do
+    if encoder = format_encoder(format) do
+      encoder.encode_to_iodata!(content)
+    else
+      content
     end
   end
 
