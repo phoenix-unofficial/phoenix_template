@@ -1,26 +1,26 @@
 defmodule Phoenix.Template do
   @moduledoc """
-  Templates are markup languages that are compiled to Elixir code.
-
   This module provides functions for loading and compiling templates
-  from disk. A markup language is compiled to Elixir code via an engine.
-  See `Phoenix.Template.Engine`.
+  from disk.
 
-  In practice, developers rarely use `Phoenix.Template` directly. Instead,
-  libraries such as `Phoenix.View` and `Phoenix.LiveView` use it as a
-  building block.
+  Templates are markup languages that are compiled to Elixir code. A
+  markup language is compiled to Elixir code via an engine.
+
+  In practice, developers rarely use `Phoenix.Template` directly.
+  Instead, libraries use it as a building block.
 
   ## Custom Template Engines
 
-  Phoenix supports custom template engines. Engines tell
-  Phoenix how to convert a template path into quoted expressions.
-  See `Phoenix.Template.Engine` for more information on
-  the API required to be implemented by custom engines.
+  Phoenix supports custom template engines. Engines tell Phoenix how
+  to convert a template path into quoted expressions.
 
-  Once a template engine is defined, you can tell Phoenix
-  about it via the template engines option:
+  See `Phoenix.Template.Engine` for more information on the API
+  required to be implemented by custom engines.
 
-      config :phoenix, :template_engines,
+  Once a template engine is defined, you can tell Phoenix about it
+  via the template engines option:
+
+      config :phoenix_template, :template_engines,
         eex: Phoenix.Template.EExEngine,
         exs: Phoenix.Template.ExsEngine
 
