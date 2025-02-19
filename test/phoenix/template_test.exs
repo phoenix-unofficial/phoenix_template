@@ -76,11 +76,9 @@ defmodule Phoenix.TemplateTest do
       refute AllTemplates.__mix_recompile__?()
     end
 
-    if Version.match?(System.version(), ">= 1.12.0") do
-      test "trims only compiled HTML files" do
-        assert AllTemplates.no_trim_text_eex(%{}) == "12\n  34\n56\n"
-        assert AllTemplates.trim_html_eex(%{}) |> Phoenix.HTML.safe_to_string() == "12\n34\n56"
-      end
+    test "trims only compiled HTML files" do
+      assert AllTemplates.no_trim_text_eex(%{}) == "12\n  34\n56\n"
+      assert AllTemplates.trim_html_eex(%{}) |> Phoenix.HTML.safe_to_string() == "12\n34\n56"
     end
 
     defmodule OptionsTemplates do
@@ -157,6 +155,15 @@ defmodule Phoenix.TemplateTest do
     test "render_to_string/4" do
       assert Template.render_to_string(AllTemplates, "show_html_eex", "html", %{message: "hello!"}) ==
                "<div>Show! hello!</div>\n"
+    end
+
+    test "render_to_string/4 with bad layout" do
+      msg = ~r/no "bad_layout" html template defined for Phoenix.TemplateTest.AllTemplates/
+
+      assert_raise ArgumentError, msg, fn ->
+        assigns = %{message: "hello!", layout: {AllTemplates, "bad_layout"}}
+        Template.render_to_string(AllTemplates, "show_html_eex", "html", assigns)
+      end
     end
   end
 end

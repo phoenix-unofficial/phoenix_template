@@ -8,7 +8,7 @@ defmodule PhoenixTemplate.MixProject do
     [
       app: :phoenix_template,
       version: @version,
-      elixir: "~> 1.9",
+      elixir: "~> 1.15",
       description: "Template rendering for Phoenix",
       docs: docs(),
       deps: deps(),
