@@ -253,40 +253,6 @@ defmodule Phoenix.Template do
   ## Configuration API
 
   @doc """
-  Returns the format encoder for the given template.
-  """
-  @spec format_encoder(format :: String.t()) :: module | nil
-  def format_encoder(format) when is_binary(format) do
-    Map.get(compiled_format_encoders(), format)
-  end
-
-  defp compiled_format_encoders do
-    case Application.fetch_env(:phoenix_template, :compiled_format_encoders) do
-      {:ok, encoders} ->
-        encoders
-
-      :error ->
-        encoders =
-          default_encoders()
-          |> Keyword.merge(raw_config(:format_encoders, []))
-          |> Enum.filter(fn {_, v} -> v end)
-          |> Enum.into(%{}, fn {k, v} -> {to_string(k), v} end)
-
-        Application.put_env(:phoenix_template, :compiled_format_encoders, encoders)
-        encoders
-    end
-  end
-
-  defp default_encoders do
-    [html: Phoenix.HTML.Engine, json: json_library(), js: Phoenix.HTML.Engine]
-  end
-
-  defp json_library() do
-    Application.get_env(:phoenix_template, :json_library) ||
-      Application.get_env(:phoenix, :json_library, Jason)
-  end
-
-  @doc """
   Returns a keyword list with all template engines
   extensions followed by their modules.
   """
@@ -318,6 +284,44 @@ defmodule Phoenix.Template do
       exs: Phoenix.Template.ExsEngine,
       heex: Phoenix.LiveView.HTMLEngine
     ]
+  end
+
+  @doc """
+  Returns the format encoder for the given template.
+  """
+  @spec format_encoder(format :: String.t()) :: module | nil
+  def format_encoder(format) when is_binary(format) do
+    Map.get(compiled_format_encoders(), format)
+  end
+
+  defp compiled_format_encoders do
+    case Application.fetch_env(:phoenix_template, :compiled_format_encoders) do
+      {:ok, encoders} ->
+        encoders
+
+      :error ->
+        encoders =
+          default_encoders()
+          |> Keyword.merge(raw_config(:format_encoders, []))
+          |> Enum.filter(fn {_, v} -> v end)
+          |> Enum.into(%{}, fn {k, v} -> {to_string(k), v} end)
+
+        Application.put_env(:phoenix_template, :compiled_format_encoders, encoders)
+        encoders
+    end
+  end
+
+  defp default_encoders do
+    [
+      html: Phoenix.HTML.Engine,
+      json: json_library(),
+      js: Phoenix.HTML.Engine
+    ]
+  end
+
+  defp json_library() do
+    Application.get_env(:phoenix_template, :json_library) ||
+      Application.get_env(:phoenix, :json_library, Jason)
   end
 
   defp raw_config(name, fallback) do
