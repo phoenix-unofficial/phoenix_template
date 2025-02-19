@@ -370,9 +370,9 @@ defmodule Phoenix.Template do
         "*.eex"
       )
 
-  If the directory has templates named `foo.eex` and `bar.eex`,
-  they will be compiled into the functions `foo/1` and `bar/1`
-  that receive the template `assigns` as argument.
+  If the directory has templates named `foo.eex` and `bar.eex`, they
+  will be compiled into the functions `foo/1` and `bar/1` that receive
+  the template `assigns` as argument.
 
   You may optionally pass a keyword list of engines. If a list
   is given, we will lookup and compile only this subset of engines.
@@ -400,15 +400,15 @@ defmodule Phoenix.Template do
     engines = given_engines || engines()
     paths = find_all(root, pattern, engines)
 
-    {triplets, {paths, engines}} =
+    {triples, {paths, engines}} =
       Enum.map_reduce(paths, {[], %{}}, fn path, {acc_paths, acc_engines} ->
         ext = Path.extname(path) |> String.trim_leading(".") |> String.to_atom()
         engine = Map.fetch!(engines, ext)
         name = converter.(path)
         body = engine.compile(path, name)
-        map = {path, name, body}
-        reduce = {[path | acc_paths], Map.put(acc_engines, engine, true)}
-        {map, reduce}
+        triple = {path, name, body}
+        acc = {[path | acc_paths], Map.put(acc_engines, engine, true)}
+        {triple, acc}
       end)
 
     # Store the engines so we define compile-time deps
@@ -418,10 +418,12 @@ defmodule Phoenix.Template do
     hash = paths |> Enum.sort() |> :erlang.md5()
 
     args =
-      if given_engines, do: [root, pattern, Macro.escape(given_engines)], else: [root, pattern]
+      if given_engines,
+        do: [root, pattern, Macro.escape(given_engines)],
+        else: [root, pattern]
 
     Module.put_attribute(module, :phoenix_templates_hashes, {hash, args})
-    triplets
+    triples
   end
 
   @doc false
