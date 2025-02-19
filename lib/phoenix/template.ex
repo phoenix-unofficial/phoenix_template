@@ -283,7 +283,6 @@ defmodule Phoenix.Template do
 
   defp json_library() do
     Application.get_env(:phoenix_template, :json_library) ||
-      deprecated_config(:phoenix_view, :json_library) ||
       Application.get_env(:phoenix, :json_library, Jason)
   end
 
@@ -323,18 +322,7 @@ defmodule Phoenix.Template do
 
   defp raw_config(name, fallback) do
     Application.get_env(:phoenix_template, name) ||
-      deprecated_config(:phoenix_view, name) ||
       Application.get_env(:phoenix, name, fallback)
-  end
-
-  defp deprecated_config(app, name) do
-    if value = Application.get_env(app, name) do
-      IO.warn(
-        "config :#{app}, :#{name} is deprecated, please use config :phoenix_template, :#{name} instead"
-      )
-
-      value
-    end
   end
 
   ## Lookup API
@@ -470,39 +458,6 @@ defmodule Phoenix.Template do
       def __mix_recompile__? do
         unquote(body)
       end
-    end
-  end
-
-  ## Deprecated API
-
-  @deprecated "Use Phoenix.View.template_path_to_name/3"
-  def template_path_to_name(path, root) do
-    path
-    |> Path.rootname()
-    |> Path.relative_to(root)
-  end
-
-  @deprecated "Use Phoenix.View.module_to_template_root/3"
-  def module_to_template_root(module, base, suffix) do
-    module
-    |> unsuffix(suffix)
-    |> Module.split()
-    |> Enum.drop(length(Module.split(base)))
-    |> Enum.map(&Macro.underscore/1)
-    |> join_paths()
-  end
-
-  defp join_paths([]), do: ""
-  defp join_paths(paths), do: Path.join(paths)
-
-  defp unsuffix(value, suffix) do
-    string = to_string(value)
-    suffix_size = byte_size(suffix)
-    prefix_size = byte_size(string) - suffix_size
-
-    case string do
-      <<prefix::binary-size(prefix_size), ^suffix::binary>> -> prefix
-      _ -> string
     end
   end
 end
