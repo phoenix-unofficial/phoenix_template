@@ -10,7 +10,7 @@ defmodule PhoenixTemplate.MixProject do
     [
       app: :phoenix_template,
       version: @version,
-      elixir: "~> 1.15",
+      elixir: "~> 1.16",
       deps: deps(),
       description: @description,
       source_url: @source_url,
