@@ -1,18 +1,23 @@
 defmodule PhoenixTemplate.MixProject do
   use Mix.Project
 
-  @version "1.0.4"
-  @source_url "https://github.com/phoenixframework/phoenix_template"
+  @version "1.0.0"
+  @description "Template rendering for Phoenix"
+  @source_url "https://github.com/phoenix-unofficial/phoenix_template"
+  @changelog_url "https://github.com/phoenix-unofficial/phoenix_template/blob/v#{@version}/CHANGELOG.md"
 
   def project do
     [
       app: :phoenix_template,
       version: @version,
       elixir: "~> 1.15",
-      description: "Template rendering for Phoenix",
-      docs: docs(),
       deps: deps(),
-      package: package()
+      description: @description,
+      source_url: @source_url,
+      homepage_url: @source_url,
+      docs: docs(),
+      package: package(),
+      aliases: aliases()
     ]
   end
 
@@ -22,28 +27,44 @@ defmodule PhoenixTemplate.MixProject do
     ]
   end
 
-  defp docs do
-    [
-      main: "Phoenix.Template",
-      source_url: @source_url,
-      source_ref: "v#{@version}",
-      extras: ["CHANGELOG.md"]
-    ]
-  end
-
   defp deps do
     [
       {:phoenix_html, "~> 4.0", optional: true},
-      {:jason, "~> 1.0", only: :test},
-      {:ex_doc, "~> 0.37", only: :dev}
+      {:ex_check, ">= 0.0.0", only: [:dev], runtime: false},
+      {:credo, ">= 0.0.0", only: [:dev], runtime: false},
+      {:dialyxir, ">= 0.0.0", only: [:dev], runtime: false},
+      {:ex_doc, ">= 0.0.0", only: [:dev], runtime: false},
+      {:mix_audit, ">= 0.0.0", only: [:dev], runtime: false},
+      {:jason, "~> 1.0", only: [:dev, :test]}
+    ]
+  end
+
+  defp docs do
+    [
+      extras: ["CHANGELOG.md"],
+      main: "Phoenix.Template",
+      source_url: @source_url,
+      source_ref: "v#{@version}"
     ]
   end
 
   defp package do
     [
-      maintainers: ["Chris McCord", "José Valim", "Gary Rennie"],
       licenses: ["MIT"],
-      links: %{"GitHub" => @source_url}
+      links: %{
+        "GitHub" => @source_url,
+        "Changelog" => @changelog_url
+      }
     ]
+  end
+
+  defp aliases do
+    [publish: ["tag"], tag: &tag_release/1]
+  end
+
+  defp tag_release(_) do
+    Mix.shell().info("Tagging release as v#{@version}")
+    System.cmd("git", ["tag", "v#{@version}"])
+    System.cmd("git", ["push", "--tags"])
   end
 end
